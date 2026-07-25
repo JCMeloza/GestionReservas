@@ -143,3 +143,48 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.resource} - {self.user} - {self.start_date}"
+
+class RecurringBooking(models.Model):
+
+    FREQUENCY_CHOICES = [
+        ('weekly', 'Semanal'),
+        ('monthly', 'Mensual'),
+    ]
+
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="recurring_bookings"
+    )
+
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name="recurring_bookings"
+    )
+
+    day_of_week = models.IntegerField(
+        choices=Availability.DAYS_OF_WEEK
+    )
+
+    start_time = models.TimeField()
+
+    end_time = models.TimeField()
+
+    start_date = models.DateField()
+
+    end_date = models.DateField()
+
+    frequency = models.CharField(
+        max_length=20,
+        choices=FREQUENCY_CHOICES,
+        default='weekly'
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+
+    def __str__(self):
+        return f"{self.user} - {self.resource} - {self.get_day_of_week_display()}"

@@ -96,7 +96,7 @@ class Booking(models.Model):
             ('confirmed', 'Confirmado'),
             ('cancelled', 'Cancelado'),
         ],
-        default = 'pending'
+        default = 'confirmed'
     )
 
     created_at = models.DateTimeField( auto_now_add=True)
@@ -184,6 +184,26 @@ class RecurringBooking(models.Model):
     is_active = models.BooleanField(
         default=True
     )
+    
+    def clean(self):
+
+        # Comprobar que la fecha inicial coincide con el día elegido
+        if self.start_date.weekday() != self.day_of_week:
+            raise ValidationError(
+                "La fecha de inicio no coincide con el día de la semana seleccionado."
+            )
+
+        # Comprobar que la fecha final es posterior a la inicial
+        if self.start_date > self.end_date:
+            raise ValidationError(
+                "La fecha final debe ser posterior a la fecha inicial."
+            )
+
+        # Comprobar horario correcto
+        if self.start_time >= self.end_time:
+            raise ValidationError(
+                "La hora de inicio debe ser anterior a la hora final."
+            )
 
 
     def __str__(self):

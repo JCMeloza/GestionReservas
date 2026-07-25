@@ -1,26 +1,30 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-# Create your models here.
 
 class Resource(models.Model):
+
     name = models.CharField(
-        max_length = 50,
-        unique = True
+        max_length=50,
+        unique=True
     )
+
     description = models.TextField(
-        blank = True,
-        null = True
+        blank=True,
+        null=True
     )
+
     is_active = models.BooleanField(
-        default = True
+        default=True
     )
 
     def __str__(self):
         return self.name
-    
+
+
+
 class Availability(models.Model):
-    
+
     DAYS_OF_WEEK = [
         (0, "Lunes"),
         (1, "Martes"),
@@ -30,40 +34,57 @@ class Availability(models.Model):
         (5, "Sábado"),
         (6, "Domingo"),
     ]
-    
+
+
     resource = models.ForeignKey(
-        Resource, 
-        on_delete = models.CASCADE,
+        Resource,
+        on_delete=models.CASCADE,
         related_name="availabilities"
     )
-    
+
+
     day_of_week = models.IntegerField(
         choices=DAYS_OF_WEEK
     )
 
-    start_time = models.TimeField()    
+
+    start_time = models.TimeField()
+
     end_time = models.TimeField()
-    
-    def is_available(self, check_datetime):
-        return (
-            self.day_of_week == check_datetime.weekday()
-            and self.start_time <= check_datetime.time() <= self.end_time
-        )
-    
+
+
     def clean(self):
+
         if self.start_time >= self.end_time:
             raise ValidationError(
                 "La hora de inicio debe ser anterior a la hora final."
             )
 
+
+    def is_available(self, check_datetime):
+
+        return (
+            self.day_of_week == check_datetime.weekday()
+            and self.start_time <= check_datetime.time() <= self.end_time
+        )
+
+
     def __str__(self):
-        return f"{self.resource} de {self.get_day_of_week_display()}  {self.start_time}-{self.end_time}"
+
+        return (
+            f"{self.resource} - "
+            f"{self.get_day_of_week_display()} "
+            f"{self.start_time}-{self.end_time}"
+        )
+
 
     class Meta:
+
         verbose_name = "Disponibilidad"
         verbose_name_plural = "Disponibilidades"
+
         constraints = [
-        models.UniqueConstraint(
+            models.UniqueConstraint(
                 fields=[
                     "resource",
                     "day_of_week",
@@ -74,42 +95,195 @@ class Availability(models.Model):
             )
         ]
 
-class Booking(models.Model):
-    
+
+
+class RecurringBooking(models.Model):
+
+
+    FREQUENCY_CHOICES = [
+        ('weekly', 'Semanal'),
+        ('monthly', 'Mensual'),
+    ]
+
+
     resource = models.ForeignKey(
-        Resource, 
-        on_delete = models.CASCADE,
-        related_name="bookings"
-    )
-    
-    user = models.ForeignKey(
-        'users.User', 
-        on_delete = models.CASCADE,
-        related_name="reservations",
-    )
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    status = models.CharField(
-        max_length = 20,
-        choices = [
-            ('pending', 'Pendiente'),
-            ('confirmed', 'Confirmado'),
-            ('cancelled', 'Cancelado'),
-        ],
-        default = 'confirmed'
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="recurring_bookings"
     )
 
-    created_at = models.DateTimeField( auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now = True)
+
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name="recurring_reservations"
+    )
+
+
+    day_of_week = models.IntegerField(
+        choices=Availability.DAYS_OF_WEEK
+    )
+
+
+    start_time = models.TimeField()
+
+    end_time = models.TimeField()
+
+
+    start_date = models.DateField()
+
+    end_date = models.DateField()
+
+
+    frequency = models.CharField(
+        max_length=20,
+        choices=FREQUENCY_CHOICES,
+        default="weekly"
+    )
+
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
 
     def clean(self):
-        # 1. Comprobar que la fecha de inicio es anterior al final
+
+        if not self.resource.is_active:
+            raise ValidationError(
+                "No se puede crear una reserva para una pista inactiva."
+            )
+
+
+        if self.start_date > self.end_date:
+            raise ValidationError(
+                "La fecha inicial debe ser anterior a la fecha final."
+            )
+
+
+        if self.start_time >= self.end_time:
+            raise ValidationError(
+                "La hora de inicio debe ser anterior a la hora final."
+            )
+
+
+        if self.start_date.weekday() != self.day_of_week:
+            raise ValidationError(
+                "La fecha inicial no coincide con el día seleccionado."
+            )
+
+
+    def __str__(self):
+
+        return (
+            f"{self.user} - "
+            f"{self.resource} - "
+            f"{self.get_day_of_week_display()}"
+        )
+
+
+    class Meta:
+
+        verbose_name = "Reserva recurrente"
+        verbose_name_plural = "Reservas recurrentes"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "resource",
+                    "user",
+                    "day_of_week",
+                    "start_time",
+                    "end_time",
+                    "start_date",
+                    "end_date"
+                ],
+                name="unique_recurring_booking"
+            )
+        ]
+
+
+
+class Booking(models.Model):
+
+
+    STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('confirmed', 'Confirmado'),
+        ('cancelled', 'Cancelado'),
+    ]
+
+
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="bookings"
+    )
+
+
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name="reservations"
+    )
+
+
+    recurring_booking = models.ForeignKey(
+        RecurringBooking,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="generated_bookings"
+    )
+
+
+    start_date = models.DateTimeField()
+
+    end_date = models.DateTimeField()
+
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="confirmed"
+    )
+
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+
+
+    def clean(self):
+
+        if not self.resource.is_active:
+            raise ValidationError(
+                "La pista no está disponible."
+            )
+
+
         if self.start_date >= self.end_date:
             raise ValidationError(
                 "La hora de inicio debe ser anterior a la hora final."
             )
 
-        # 2. Comprobar solapamientos
+
         overlapping = Booking.objects.filter(
             resource=self.resource,
             start_date__lt=self.end_date,
@@ -118,13 +292,15 @@ class Booking(models.Model):
             id=self.id
         )
 
+
         if overlapping.exists():
             raise ValidationError(
                 "La pista ya está reservada en ese horario."
             )
 
-        # 3. Comprobar disponibilidad semanal
+
         weekday = self.start_date.weekday()
+
 
         available = Availability.objects.filter(
             resource=self.resource,
@@ -133,78 +309,18 @@ class Booking(models.Model):
             end_time__gte=self.end_date.time()
         )
 
+
         if not available.exists():
             raise ValidationError(
                 "La pista no está disponible en ese horario."
             )
-        # Comprobar si la pista esta activa    
-        if not self.resource.is_active:
-            raise ValidationError("La pista no está disponible.")
 
-    def __str__(self):
-        return f"{self.resource} - {self.user} - {self.start_date}"
-
-class RecurringBooking(models.Model):
-
-    FREQUENCY_CHOICES = [
-        ('weekly', 'Semanal'),
-        ('monthly', 'Mensual'),
-    ]
-
-    resource = models.ForeignKey(
-        Resource,
-        on_delete=models.CASCADE,
-        related_name="recurring_bookings"
-    )
-
-    user = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        related_name="recurring_bookings"
-    )
-
-    day_of_week = models.IntegerField(
-        choices=Availability.DAYS_OF_WEEK
-    )
-
-    start_time = models.TimeField()
-
-    end_time = models.TimeField()
-
-    start_date = models.DateField()
-
-    end_date = models.DateField()
-
-    frequency = models.CharField(
-        max_length=20,
-        choices=FREQUENCY_CHOICES,
-        default='weekly'
-    )
-
-    is_active = models.BooleanField(
-        default=True
-    )
-    
-    def clean(self):
-
-        # Comprobar que la fecha inicial coincide con el día elegido
-        if self.start_date.weekday() != self.day_of_week:
-            raise ValidationError(
-                "La fecha de inicio no coincide con el día de la semana seleccionado."
-            )
-
-        # Comprobar que la fecha final es posterior a la inicial
-        if self.start_date > self.end_date:
-            raise ValidationError(
-                "La fecha final debe ser posterior a la fecha inicial."
-            )
-
-        # Comprobar horario correcto
-        if self.start_time >= self.end_time:
-            raise ValidationError(
-                "La hora de inicio debe ser anterior a la hora final."
-            )
 
 
     def __str__(self):
-        return f"{self.user} - {self.resource} - {self.get_day_of_week_display()}"
+
+        return (
+            f"{self.resource} - "
+            f"{self.user} - "
+            f"{self.start_date}"
+        )

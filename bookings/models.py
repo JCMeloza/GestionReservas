@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 # Create your models here.
@@ -53,6 +54,7 @@ class Availability(models.Model):
 
     class Meta:
         verbose_name = "Disponibilidad"
+        verbose_name_plural = "Disponibilidades"
 
 class Booking(models.Model):
     
@@ -64,7 +66,8 @@ class Booking(models.Model):
     
     user = models.ForeignKey(
         'users.User', 
-        on_delete = models.CASCADE
+        on_delete = models.CASCADE,
+        related_name="reservations",
     )
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
@@ -77,6 +80,9 @@ class Booking(models.Model):
         ],
         default = 'pending'
     )
+
+    created_at = models.DateTimeField( auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now = True)
 
     def clean(self):
         # 1. Comprobar que la fecha de inicio es anterior al final
@@ -113,6 +119,9 @@ class Booking(models.Model):
             raise ValidationError(
                 "La pista no está disponible en ese horario."
             )
+        # Comprobar si la pista esta activa    
+        if not self.resource.is_active:
+            raise ValidationError("La pista no está disponible.")
 
     def __str__(self):
         return f"{self.resource} - {self.user} - {self.start_date}"

@@ -49,12 +49,30 @@ class Availability(models.Model):
             self.day_of_week == check_datetime.weekday()
             and self.start_time <= check_datetime.time() <= self.end_time
         )
+    
+    def clean(self):
+        if self.start_time >= self.end_time:
+            raise ValidationError(
+                "La hora de inicio debe ser anterior a la hora final."
+            )
+
     def __str__(self):
         return f"{self.resource} de {self.get_day_of_week_display()}  {self.start_time}-{self.end_time}"
 
     class Meta:
         verbose_name = "Disponibilidad"
         verbose_name_plural = "Disponibilidades"
+        constraints = [
+        models.UniqueConstraint(
+                fields=[
+                    "resource",
+                    "day_of_week",
+                    "start_time",
+                    "end_time"
+                ],
+                name="unique_resource_availability"
+            )
+        ]
 
 class Booking(models.Model):
     

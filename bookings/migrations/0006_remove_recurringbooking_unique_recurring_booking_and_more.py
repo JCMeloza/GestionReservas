@@ -11,12 +11,22 @@ def backfill_monthly_day_of_month(apps, schema_editor):
         frequency="monthly", day_of_month__isnull=True
     ).iterator():
         booking.day_of_month = booking.start_date.day
-        booking.save(update_fields=["day_of_month"])
+        # Legacy rows carry day_of_week NOT NULL (old schema). The new
+        # CheckConstraint requires day_of_week IS NULL for monthly rows, so
+        # null it here or the constraint addition crashes with IntegrityError.
+        booking.day_of_week = None
+        booking.save(update_fields=["day_of_month", "day_of_week"])
 
 
 def reverse_backfill_monthly_day_of_month(apps, schema_editor):
-    # No-op: the guard is additive; rolling back keeps the backfilled values.
-    pass
+    # The forward guard nulls day_of_week on monthly rows, so the reverse must
+    # restore it: the 0005 AlterField back to NOT NULL fails on NULL rows.
+    RecurringBooking = apps.get_model("bookings", "RecurringBooking")
+    for booking in RecurringBooking.objects.filter(
+        frequency="monthly", day_of_week__isnull=True
+    ).iterator():
+        booking.day_of_week = booking.start_date.weekday()
+        booking.save(update_fields=["day_of_week"])
 
 
 class Migration(migrations.Migration):

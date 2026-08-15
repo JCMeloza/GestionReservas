@@ -1,8 +1,9 @@
 from datetime import date, time, timedelta
 
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
-from django.test import TestCase
+from django.db import IntegrityError, connection
+from django.db.migrations.executor import MigrationExecutor
+from django.test import TestCase, TransactionTestCase
 
 from bookings.models import RecurringBooking, Resource
 from users.models import User
@@ -229,3 +230,66 @@ class RecurringBookingModelTests(TestCase):
                     start_date=start_date,
                 )
                 self.assertIsNone(booking.full_clean())
+
+
+class RecurringBookingMigrationTests(TransactionTestCase):
+    """Regression: the 0006 guard must backfill legacy monthly rows without
+    breaking the new CheckConstraint (old schema forced day_of_week NOT NULL),
+    and its reverse must restore day_of_week so the AlterField back to NOT
+    NULL cannot fail on NULL rows."""
+
+    migrate_from = ("bookings", "0005_alter_recurringbooking_options_and_more")
+    migrate_to = ("bookings", "0006_remove_recurringbooking_unique_recurring_booking_and_more")
+
+    def setUp(self):
+        super().setUp()
+        self.executor = MigrationExecutor(connection)
+
+    def tearDown(self):
+        # Leave the test DB schema at the latest state so later tests are unaffected.
+        self.executor.loader.build_graph()
+        self.executor.migrate([self.migrate_to])
+        super().tearDown()
+
+    def test_0006_backfills_legacy_monthly_rows_and_reverse_restores_day_of_week(self):
+        # State at 0005: insert a legacy monthly row (day_of_week NOT NULL,
+        # no day_of_month column yet).
+        self.executor.migrate([self.migrate_from])
+        old_apps = self.executor.loader.project_state([self.migrate_from]).apps
+
+        User = old_apps.get_model("users", "User")
+        Resource = old_apps.get_model("bookings", "Resource")
+        RecurringBooking = old_apps.get_model("bookings", "RecurringBooking")
+
+        resource = Resource.objects.create(name="Pista Legacy")
+        user = User.objects.create_user(username="legacy_user", password="pass123")
+        start_date = date(2026, 8, 15)
+        legacy = RecurringBooking.objects.create(
+            resource=resource,
+            user=user,
+            frequency="monthly",
+            day_of_week=0,  # legacy: old schema forced NOT NULL
+            start_time=time(10, 0),
+            end_time=time(11, 0),
+            start_date=start_date,
+            end_date=date(2026, 12, 15),
+        )
+
+        # Forward: 0006 must apply cleanly and the row must satisfy the monthly
+        # branch of the new CheckConstraint (day_of_week IS NULL).
+        self.executor.loader.build_graph()
+        self.executor.migrate([self.migrate_to])
+        new_apps = self.executor.loader.project_state([self.migrate_to]).apps
+        NewRecurringBooking = new_apps.get_model("bookings", "RecurringBooking")
+        row = NewRecurringBooking.objects.get(pk=legacy.pk)
+        self.assertIsNone(row.day_of_week)
+        self.assertEqual(row.day_of_month, start_date.day)
+
+        # Reverse: 0005 must restore the weekday so the AlterField back to
+        # NOT NULL succeeds with no NULL rows left behind.
+        self.executor.loader.build_graph()
+        self.executor.migrate([self.migrate_from])
+        old_apps = self.executor.loader.project_state([self.migrate_from]).apps
+        OldRecurringBooking = old_apps.get_model("bookings", "RecurringBooking")
+        row = OldRecurringBooking.objects.get(pk=legacy.pk)
+        self.assertEqual(row.day_of_week, start_date.weekday())

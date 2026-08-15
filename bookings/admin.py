@@ -46,6 +46,7 @@ class RecurringBookingAdmin(admin.ModelAdmin):
         "resource",
         "user",
         "get_day",
+        "day_of_month",
         "start_time",
         "end_time",
         "start_date",
@@ -61,6 +62,8 @@ class RecurringBookingAdmin(admin.ModelAdmin):
     )
 
     def get_day(self, obj):
+        if obj.frequency == "monthly":
+            return obj.day_of_month
         return obj.get_day_of_week_display()
 
     get_day.short_description = "Día"

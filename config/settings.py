@@ -136,7 +136,7 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'login'
 # Si un usuario no logueado entra en una vista @login_required, va aquí.
 LOGIN_URL = reverse_lazy('login')
-LOGOUT_REDIRECT_URL = reverse_lazy('login')
+LOGOUT_REDIRECT_URL = reverse_lazy('home')
 
 LOGIN_REDIRECT_URL = 'home'
 

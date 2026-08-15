@@ -30,7 +30,10 @@
           {% if user.is_authenticated %}
             <a class="nav-auth__link" href="#">Mis reservas</a>
             <span class="nav-auth__user">{{ user.get_full_name|default:user.username }}</span>
-            <a class="btn btn--ghost btn--sm" href="{% url 'logout' %}">Cerrar sesión</a>
+            <form action="{% url 'logout' %}" method="post" class="nav-auth__logout">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--ghost btn--sm">Cerrar sesión</button>
+            </form>
           {% else %}
             <a class="nav-auth__link" href="{% url 'login' %}">Iniciar sesión</a>
             <a class="btn btn--primary btn--sm" href="{% url 'registro' %}">Registrarse</a>

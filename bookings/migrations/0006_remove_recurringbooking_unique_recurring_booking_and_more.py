@@ -6,22 +6,144 @@ from django.db import migrations, models
 
 
 def backfill_monthly_day_of_month(apps, schema_editor):
+    """Backfill day_of_month for legacy monthly rows, deduping rows that
+    collapse into the same slot under the new monthly partial unique.
+
+    Under 0005 the unique included day_of_week, so two monthly rows in the
+    same slot (same resource/user/start_time/end_time/start_date/end_date)
+    with different day_of_week values were legal. The normalization
+    (day_of_month=start_date.day, day_of_week=None) makes both rows
+    identical for the new unique_monthly_recurring, which would otherwise
+    crash the AddConstraint with IntegrityError. Keep the lowest-id row per
+    slot and delete the remaining duplicates; their generated bookings are
+    cascade-deleted with them.
+    """
     RecurringBooking = apps.get_model("bookings", "RecurringBooking")
+    pending = list(
+        RecurringBooking.objects.filter(
+            frequency="monthly", day_of_month__isnull=True
+        ).order_by("pk")
+    )
+    seen_slots = set()
+    duplicate_ids = []
+    for booking in pending:
+        # Slot key matches the future unique_monthly_recurring fields, with
+        # day_of_month resolved to start_date.day (the backfilled value).
+        slot_key = (
+            booking.resource_id,
+            booking.user_id,
+            booking.start_date.day,
+            booking.start_time,
+            booking.end_time,
+            booking.start_date,
+            booking.end_date,
+        )
+        if slot_key in seen_slots:
+            duplicate_ids.append(booking.pk)
+        else:
+            seen_slots.add(slot_key)
+
+    if duplicate_ids:
+        RecurringBooking.objects.filter(pk__in=duplicate_ids).delete()
+
+    # Backfill the survivors: monthly rows must satisfy the new CheckConstraint
+    # branch (day_of_week IS NULL) and carry day_of_month=start_date.day.
+    # Legacy rows carry day_of_week NOT NULL (old schema), so null it here or
+    # the constraint addition crashes with IntegrityError.
     for booking in RecurringBooking.objects.filter(
         frequency="monthly", day_of_month__isnull=True
     ).iterator():
         booking.day_of_month = booking.start_date.day
-        # Legacy rows carry day_of_week NOT NULL (old schema). The new
-        # CheckConstraint requires day_of_week IS NULL for monthly rows, so
-        # null it here or the constraint addition crashes with IntegrityError.
         booking.day_of_week = None
         booking.save(update_fields=["day_of_month", "day_of_week"])
 
 
 def reverse_backfill_monthly_day_of_month(apps, schema_editor):
-    # The forward guard nulls day_of_week on monthly rows, so the reverse must
-    # restore it: the 0005 AlterField back to NOT NULL fails on NULL rows.
+    """Restore day_of_week on monthly rows so the 0005 AlterField back to
+    NOT NULL cannot fail, while avoiding collisions under the restored 0005
+    unique (which includes day_of_week).
+
+    Under the new schema, monthly rows in the same slot may hold different
+    day_of_month values: the CheckConstraint validates the range (1-31) and
+    day_of_week IS NULL, not start_date.day == day_of_month (that coherence
+    is clean()-only and skippable via objects.create). Restoring
+    day_of_week=start_date.weekday() for all of them would collide under the
+    old unique and crash the reverse with TransactionManagementError. Per
+    colliding slot, keep the coherent row (day_of_month == start_date.day,
+    else the lowest id), restore it, and delete the rest — they cannot be
+    preserved under the old schema. The same occupancy check covers a weekly
+    row already holding the restored weekday in the same slot.
+    """
     RecurringBooking = apps.get_model("bookings", "RecurringBooking")
+
+    # Slots already occupied under the old unique by rows that keep their
+    # day_of_week (weekly rows, or monthly rows restored by a previous run).
+    occupancy = set()
+    for row in RecurringBooking.objects.exclude(day_of_week__isnull=True):
+        occupancy.add(
+            (
+                row.resource_id,
+                row.user_id,
+                row.day_of_week,
+                row.start_time,
+                row.end_time,
+                row.start_date,
+                row.end_date,
+            )
+        )
+
+    monthly_rows = list(
+        RecurringBooking.objects.filter(
+            frequency="monthly", day_of_week__isnull=True
+        ).order_by("pk")
+    )
+    # Group by old-unique slot: everything except day_of_week.
+    slots = {}
+    for row in monthly_rows:
+        slots.setdefault(
+            (
+                row.resource_id,
+                row.user_id,
+                row.start_time,
+                row.end_time,
+                row.start_date,
+                row.end_date,
+            ),
+            [],
+        ).append(row)
+
+    to_delete = []
+    for slot_rows in slots.values():
+        if len(slot_rows) == 1:
+            keeper = slot_rows[0]
+        else:
+            # Colliding slot: prefer the coherent row (day_of_month matches
+            # start_date.day), else the lowest id.
+            keeper = next(
+                (r for r in slot_rows if r.day_of_month == r.start_date.day),
+                slot_rows[0],
+            )
+            for row in slot_rows:
+                if row.pk != keeper.pk:
+                    to_delete.append(row.pk)
+        restored_key = (
+            keeper.resource_id,
+            keeper.user_id,
+            keeper.start_date.weekday(),
+            keeper.start_time,
+            keeper.end_time,
+            keeper.start_date,
+            keeper.end_date,
+        )
+        if restored_key in occupancy:
+            # Even the keeper would collide with an existing row; drop it.
+            to_delete.append(keeper.pk)
+        else:
+            occupancy.add(restored_key)
+
+    if to_delete:
+        RecurringBooking.objects.filter(pk__in=to_delete).delete()
+
     for booking in RecurringBooking.objects.filter(
         frequency="monthly", day_of_week__isnull=True
     ).iterator():

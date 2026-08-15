@@ -260,7 +260,14 @@ class RecurringBookingMigrationTests(TransactionTestCase):
     """Regression: the 0006 guard must backfill legacy monthly rows without
     breaking the new CheckConstraint (old schema forced day_of_week NOT NULL),
     and its reverse must restore day_of_week so the AlterField back to NOT
-    NULL cannot fail on NULL rows."""
+    NULL cannot fail on NULL rows.
+
+    Also covers the reviewer findings on the migration:
+    - forward dedupes legacy monthly duplicates that collapse into the same
+      slot under the new unique_monthly_recurring (WARNING #1);
+    - reverse survives slots where several monthly rows hold different
+      day_of_month values and would collide under the restored 0005 unique
+      (WARNING #2)."""
 
     migrate_from = ("bookings", "0005_alter_recurringbooking_options_and_more")
     migrate_to = ("bookings", "0006_remove_recurringbooking_unique_recurring_booking_and_more")
@@ -317,3 +324,97 @@ class RecurringBookingMigrationTests(TransactionTestCase):
         OldRecurringBooking = old_apps.get_model("bookings", "RecurringBooking")
         row = OldRecurringBooking.objects.get(pk=legacy.pk)
         self.assertEqual(row.day_of_week, start_date.weekday())
+
+    def test_0006_forward_dedupes_legacy_monthly_duplicates(self):
+        # Under 0005 the unique included day_of_week, so two monthly rows in
+        # the same slot (same resource/user/start_time/end_time/start_date/
+        # end_date) with different day_of_week values are legal. The backfill
+        # normalizes both to day_of_month=start_date.day / day_of_week=None,
+        # which would collide under the new unique_monthly_recurring unless
+        # the duplicates are removed. Regression for the reviewer's WARNING #1.
+        self.executor.migrate([self.migrate_from])
+        old_apps = self.executor.loader.project_state([self.migrate_from]).apps
+
+        User = old_apps.get_model("users", "User")
+        Resource = old_apps.get_model("bookings", "Resource")
+        RecurringBooking = old_apps.get_model("bookings", "RecurringBooking")
+
+        resource = Resource.objects.create(name="Pista Duplicada")
+        user = User.objects.create_user(username="dup_user", password="pass123")
+        start_date = date(2026, 8, 15)
+        slot = dict(
+            resource=resource,
+            user=user,
+            frequency="monthly",
+            start_time=time(10, 0),
+            end_time=time(11, 0),
+            start_date=start_date,
+            end_date=date(2026, 12, 15),
+        )
+        first = RecurringBooking.objects.create(day_of_week=0, **slot)
+        duplicate = RecurringBooking.objects.create(day_of_week=1, **slot)
+        self.assertNotEqual(first.pk, duplicate.pk)
+
+        # Forward: 0006 must apply cleanly and keep exactly one row per slot.
+        self.executor.loader.build_graph()
+        self.executor.migrate([self.migrate_to])
+        new_apps = self.executor.loader.project_state([self.migrate_to]).apps
+        NewRecurringBooking = new_apps.get_model("bookings", "RecurringBooking")
+        survivors = list(NewRecurringBooking.objects.filter(frequency="monthly"))
+        self.assertEqual(len(survivors), 1)
+        survivor = survivors[0]
+        # The lowest-id row wins, and the normalized row satisfies the monthly
+        # branch of the new CheckConstraint (day_of_week IS NULL).
+        self.assertEqual(survivor.pk, first.pk)
+        self.assertIsNone(survivor.day_of_week)
+        self.assertEqual(survivor.day_of_month, start_date.day)
+
+    def test_0006_reverse_handles_colliding_monthly_rows(self):
+        # Under 0006 two monthly rows in the same slot with different
+        # day_of_month are legal at DB level: the CheckConstraint checks the
+        # range (1-31) and day_of_week IS NULL, not start_date.day ==
+        # day_of_month — that coherence is clean()-only and skippable via
+        # objects.create. The reverse restores day_of_week=start_date.weekday()
+        # for both, which would collide under the restored 0005 unique
+        # (which includes day_of_week). Regression for the reviewer's
+        # WARNING #2: the reverse must complete and keep one row per slot.
+        self.executor.migrate([self.migrate_to])
+        new_apps = self.executor.loader.project_state([self.migrate_to]).apps
+
+        User = new_apps.get_model("users", "User")
+        Resource = new_apps.get_model("bookings", "Resource")
+        RecurringBooking = new_apps.get_model("bookings", "RecurringBooking")
+
+        resource = Resource.objects.create(name="Pista Colisión")
+        user = User.objects.create_user(username="collision_user", password="pass123")
+        start_date = date(2026, 8, 15)  # day 15 → weekday() == 5
+        slot = dict(
+            resource=resource,
+            user=user,
+            frequency="monthly",
+            day_of_week=None,
+            start_time=time(10, 0),
+            end_time=time(11, 0),
+            start_date=start_date,
+            end_date=date(2026, 12, 15),
+        )
+        # Created first (lowest id) but incoherent: day_of_month does not match
+        # start_date.day. The coherent row must survive the reverse even
+        # though it has the higher id.
+        incoherent = RecurringBooking.objects.create(day_of_month=20, **slot)
+        coherent = RecurringBooking.objects.create(
+            day_of_month=start_date.day, **slot
+        )
+        self.assertLess(incoherent.pk, coherent.pk)
+
+        # Reverse: must complete without crashing and keep the coherent row
+        # with its weekday restored.
+        self.executor.loader.build_graph()
+        self.executor.migrate([self.migrate_from])
+        old_apps = self.executor.loader.project_state([self.migrate_from]).apps
+        OldRecurringBooking = old_apps.get_model("bookings", "RecurringBooking")
+        rows = list(OldRecurringBooking.objects.filter(frequency="monthly"))
+        self.assertEqual(len(rows), 1)
+        survivor = rows[0]
+        self.assertEqual(survivor.pk, coherent.pk)
+        self.assertEqual(survivor.day_of_week, start_date.weekday())

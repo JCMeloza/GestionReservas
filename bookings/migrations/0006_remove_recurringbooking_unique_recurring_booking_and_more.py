@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='recurringbooking',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('day_of_month__isnull', True), ('day_of_week__isnull', False), ('frequency', 'weekly')), models.Q(('day_of_month__isnull', False), ('day_of_week__isnull', True), ('frequency', 'monthly')), _connector='OR'), name='check_recurring_frequency_day'),
+            constraint=models.CheckConstraint(condition=models.Q(models.Q(('day_of_month__isnull', True), ('day_of_week__isnull', False), ('frequency', 'weekly')), models.Q(('day_of_month__isnull', False), ('day_of_month__range', (1, 31)), ('day_of_week__isnull', True), ('frequency', 'monthly')), _connector='OR'), name='check_recurring_frequency_day'),
         ),
         migrations.AddConstraint(
             model_name='recurringbooking',

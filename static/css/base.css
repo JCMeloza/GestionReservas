@@ -1,0 +1,503 @@
+/* ==========================================================================
+   Padel Arena — Estilos base
+   Layout global: reset, tokens, tipografía, navbar, botones, footer
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tokens de diseño
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta: charcoal/navy oscuro + acento verde esmeralda/teal (color pista) */
+  --color-ink-900: #0B1220;   /* fondo oscuro principal */
+  --color-ink-800: #101A2C;   /* superficies oscuras */
+  --color-ink-700: #1B2740;   /* tarjetas oscuras */
+
+  --color-emerald-700: #047857;
+  --color-emerald-600: #0E9F6E;
+  --color-emerald-500: #10B981;
+  --color-emerald-400: #34D399;
+  --color-teal-400: #2DD4BF;
+
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-300: #CBD5E1;
+  --color-slate-400: #94A3B8;
+  --color-slate-500: #64748B;
+  --color-slate-600: #475569;
+
+  --color-white: #FFFFFF;
+  --color-offwhite: #F7F9FC;
+
+  --gradient-accent: linear-gradient(135deg, #10B981 0%, #14B8A6 100%);
+
+  --font-display: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --container: 1160px;
+  --header-h: 72px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.06), 0 4px 12px rgba(11, 18, 32, 0.06);
+  --shadow-md: 0 8px 24px rgba(11, 18, 32, 0.10);
+  --shadow-lg: 0 16px 40px rgba(11, 18, 32, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Reset básico
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 12px);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-slate-600);
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-emerald-500);
+  outline-offset: 2px;
+}
+
+/* Enlace de accesibilidad: salta directamente al contenido */
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: var(--color-emerald-500);
+  color: var(--color-white);
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Layout común
+   -------------------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   Navbar
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11, 18, 32, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: var(--header-h);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__mark {
+  width: 32px;
+  height: 32px;
+  color: var(--color-emerald-400);
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  color: var(--color-white);
+}
+
+.brand__accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-links a {
+  position: relative;
+  padding: 6px 0;
+  color: var(--color-slate-300);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: var(--color-white);
+}
+
+.nav-links a:hover::after {
+  transform: scaleX(1);
+}
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-auth__link {
+  color: var(--color-slate-300);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-auth__link:hover {
+  color: var(--color-white);
+}
+
+.nav-auth__user {
+  color: var(--color-emerald-400);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: var(--color-white);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-toggle:hover {
+  border-color: var(--color-emerald-400);
+  color: var(--color-emerald-400);
+}
+
+.nav-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* --------------------------------------------------------------------------
+   Botones
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+              background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn--primary {
+  background: var(--gradient-accent);
+  color: var(--color-white);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.38);
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--color-white);
+}
+
+.btn--ghost:hover {
+  border-color: var(--color-emerald-400);
+  color: var(--color-emerald-400);
+  transform: translateY(-2px);
+}
+
+.btn--dark {
+  background: var(--color-ink-900);
+  color: var(--color-white);
+}
+
+.btn--dark:hover {
+  background: var(--color-ink-800);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--sm {
+  padding: 9px 18px;
+  font-size: 0.875rem;
+}
+
+/* --------------------------------------------------------------------------
+   Cabeceras de sección (compartidas por las secciones de la home)
+   -------------------------------------------------------------------------- */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-emerald-600);
+}
+
+.section-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-accent);
+}
+
+.section-title {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  line-height: 1.15;
+  color: var(--color-ink-900);
+}
+
+.section-sub {
+  margin-top: 14px;
+  color: var(--color-slate-500);
+  font-size: 1.05rem;
+}
+
+.section-head {
+  max-width: 640px;
+  margin-bottom: 56px;
+}
+
+.section-head--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-head--center .section-eyebrow::after {
+  content: "";
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.site-footer {
+  background: var(--color-ink-900);
+  color: var(--color-slate-400);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding: 64px 0 48px;
+}
+
+.footer-brand p {
+  max-width: 34ch;
+  margin-top: 16px;
+  font-size: 0.925rem;
+}
+
+.footer-col h4 {
+  margin-bottom: 16px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.footer-col ul {
+  display: grid;
+  gap: 10px;
+  font-size: 0.925rem;
+}
+
+.footer-col a {
+  transition: color 0.2s ease;
+}
+
+.footer-col a:hover {
+  color: var(--color-emerald-400);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 0 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — navbar móvil
+   -------------------------------------------------------------------------- */
+@media (max-width: 880px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding: 24px;
+    background: var(--color-ink-900);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .nav-menu--open {
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .nav-auth {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 520px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+  }
+}

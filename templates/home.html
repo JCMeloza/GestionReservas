@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero__content">
+        <span class="hero__eyebrow">Club de pádel profesional</span>
+        <h1 class="hero__title">El pádel profesional<br><span class="accent">se juega a otro nivel</span></h1>
+        <p class="hero__sub">
+          Pistas de competición, coaching titulado y un club pensado para quienes toman el pádel
+          en serio. Reserva tu pista online en segundos.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#courts">Reservar pista</a>
+          <a class="btn btn--ghost" href="#services">Ver servicios</a>
+        </div>
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <strong>3</strong>
+            <span>Pistas cubiertas</span>
+          </div>
+          <div class="hero__stat">
+            <strong>6</strong>
+            <span>Pistas al aire libre</span>
+          </div>
+          <div class="hero__stat">
+            <strong>12</strong>
+            <span>Entrenadores titulados</span>
+          </div>
+          <div class="hero__stat">
+            <strong>24/7</strong>
+            <span>Reserva online</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ventajas -->
+  <section class="section section--alt" id="features">
+    <div class="container">
+      <div class="section-head section-head--center">
+        <span class="section-eyebrow">Por qué Padel Arena</span>
+        <h2 class="section-title">Un club diseñado para tu juego</h2>
+        <p class="section-sub">Cada detalle está pensado para que solo tengas que preocuparte de ganar.</p>
+      </div>
+
+      <div class="benefits">
+        <article class="benefit-card">
+          <div class="benefit-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <h3>Pistas de competición</h3>
+          <p>Superficies profesionales, iluminación LED y mantenimiento diario para jugar siempre en las mejores condiciones.</p>
+        </article>
+
+        <article class="benefit-card">
+          <div class="benefit-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h3>Reserva online 24/7</h3>
+          <p>Gestiona tus reservas en segundos desde cualquier dispositivo, a cualquier hora del día.</p>
+        </article>
+
+        <article class="benefit-card">
+          <div class="benefit-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+          </div>
+          <h3>Coaching profesional</h3>
+          <p>Entrenadores titulados con experiencia en circuito profesional para llevar tu juego al siguiente nivel.</p>
+        </article>
+
+        <article class="benefit-card">
+          <div class="benefit-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3>Club premium</h3>
+          <p>Vestuarios, bar y zona de descanso en un ambiente pensado para socios y visitantes.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pistas -->
+  <section class="section" id="courts">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-eyebrow">Nuestras pistas</span>
+        <h2 class="section-title">Instalaciones de primer nivel</h2>
+        <p class="section-sub">Nueve pistas con césped de alto rendimiento y las mejores condiciones de juego.</p>
+      </div>
+
+      <div class="courts-grid">
+        <article class="court-card">
+          <div class="court-card__media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="court-card__body">
+            <h3>Pista Central</h3>
+            <div class="court-card__tags">
+              <span class="tag">Cubierta</span>
+              <span class="tag">Indoor</span>
+              <span class="tag">Césped profesional</span>
+            </div>
+            <p>La pista principal del club, con tribuna y zona de espectadores para torneos y exhibiciones.</p>
+            <p class="court-card__price">desde <span>18 €/h</span></p>
+          </div>
+        </article>
+
+        <article class="court-card">
+          <div class="court-card__media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="court-card__body">
+            <h3>Pista Cubierta 2</h3>
+            <div class="court-card__tags">
+              <span class="tag">Cubierta</span>
+              <span class="tag">Indoor</span>
+              <span class="tag">Iluminación LED</span>
+            </div>
+            <p>Climatizada y con iluminación de última generación, ideal para jugar a cualquier hora.</p>
+            <p class="court-card__price">desde <span>14 €/h</span></p>
+          </div>
+        </article>
+
+        <article class="court-card">
+          <div class="court-card__media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="court-card__body">
+            <h3>Pista Cubierta 3</h3>
+            <div class="court-card__tags">
+              <span class="tag">Cubierta</span>
+              <span class="tag">Indoor</span>
+              <span class="tag">Competición</span>
+            </div>
+            <p>La favorita de nuestros socios para partidos de competición y entrenamientos técnicos.</p>
+            <p class="court-card__price">desde <span>14 €/h</span></p>
+          </div>
+        </article>
+
+        <article class="court-card">
+          <div class="court-card__media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <div class="court-card__body">
+            <h3>Pistas Exterior 1-6</h3>
+            <div class="court-card__tags">
+              <span class="tag">Descubiertas</span>
+              <span class="tag">Outdoor</span>
+              <span class="tag">Vidrio templado</span>
+            </div>
+            <p>Seis pistas al aire libre con césped de alto rendimiento y entorno natural.</p>
+            <p class="court-card__price">desde <span>10 €/h</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios -->
+  <section class="section section--dark" id="services">
+    <div class="container">
+      <div class="section-head section-head--center">
+        <span class="section-eyebrow section-eyebrow--on-dark">Servicios</span>
+        <h2 class="section-title section-title--on-dark">Todo lo que necesitas para jugar</h2>
+        <p class="section-sub section-sub--on-dark">Acompañamos tu progreso dentro y fuera de la pista.</p>
+      </div>
+
+      <div class="services-grid">
+        <article class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </div>
+          <h3>Clases y coaching</h3>
+          <p>Clases grupales e individuales para todos los niveles, desde iniciación hasta competición.</p>
+        </article>
+
+        <article class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+          </div>
+          <h3>Alquiler de palas</h3>
+          <p>Palas de última generación disponibles para alquilar por sesión o por temporada.</p>
+        </article>
+
+        <article class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
+          <h3>Tienda del club</h3>
+          <p>Palas, bolas, ropa y accesorios de las mejores marcas, con asesoramiento incluido.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banda CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>¿Listo para jugar?</h2>
+          <p>Reserva tu pista ahora y disfruta del mejor pádel de la ciudad.</p>
+        </div>
+        <a class="btn btn--dark" href="#courts">Reservar pista</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section class="section section--alt" id="contact">
+    <div class="container">
+      <div class="contact-grid">
+        <div>
+          <div class="section-head">
+            <span class="section-eyebrow">Contacto</span>
+            <h2 class="section-title">Ven a conocernos</h2>
+            <p class="section-sub">Estamos en el corazón de Madrid, a cinco minutos del centro. Te esperamos.</p>
+          </div>
+
+          <div class="contact-list">
+            <div class="contact-item">
+              <div class="contact-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <div>
+                <h3>Dirección</h3>
+                <p>Av. del Deporte 42, 28001 Madrid</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3>Teléfono</h3>
+                <p><a href="tel:+34910000000">+34 910 000 000</a></p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </div>
+              <div>
+                <h3>Email</h3>
+                <p><a href="mailto:hola@padelarena.es">hola@padelarena.es</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="contact-panel">
+          <h3>Horario del club</h3>
+          <ul class="contact-panel__hours">
+            <li><span>Lunes a viernes</span><strong>8:00 – 23:00</strong></li>
+            <li><span>Sábados y domingos</span><strong>9:00 – 22:00</strong></li>
+            <li><span>Reserva online</span><strong>24 horas</strong></li>
+          </ul>
+          <p class="contact-panel__note">¿Prefieres jugar fuera de horario? Escríbenos y lo organizamos.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

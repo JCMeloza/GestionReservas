@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Padel Arena — Club de pádel profesional. Pistas de competición, coaching y reserva online.">
+  <title>{% block title %}Padel Arena — Club de pádel profesional{% endblock %}</title>
+
+  <!-- Tipografía: Manrope (títulos) e Inter (texto) con fallback a sistema -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+{% include "includes/_navbar.html" %}
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+{% include "includes/_footer.html" %}
+
+  <script src="{% static 'js/main.js' %}" defer></script>
+</body>
+</html>

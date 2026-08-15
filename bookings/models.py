@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -121,7 +122,19 @@ class RecurringBooking(models.Model):
 
 
     day_of_week = models.IntegerField(
-        choices=Availability.DAYS_OF_WEEK
+        choices=Availability.DAYS_OF_WEEK,
+        null=True,
+        blank=True
+    )
+
+
+    day_of_month = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(31)
+        ]
     )
 
 
@@ -177,13 +190,39 @@ class RecurringBooking(models.Model):
             )
 
 
-        if self.start_date.weekday() != self.day_of_week:
-            raise ValidationError(
-                "La fecha inicial no coincide con el día seleccionado."
-            )
+        if self.frequency == "weekly":
+
+            if self.day_of_week is None or self.day_of_month is not None:
+                raise ValidationError(
+                    "Selecciona un día de la semana (semanal) o un día del mes (mensual)."
+                )
+
+            if self.start_date.weekday() != self.day_of_week:
+                raise ValidationError(
+                    "La fecha inicial no coincide con el día seleccionado."
+                )
+
+        elif self.frequency == "monthly":
+
+            if self.day_of_month is None or self.day_of_week is not None:
+                raise ValidationError(
+                    "Selecciona un día de la semana (semanal) o un día del mes (mensual)."
+                )
+
+            if self.start_date.day != self.day_of_month:
+                raise ValidationError(
+                    "La fecha inicial no coincide con el día seleccionado."
+                )
 
 
     def __str__(self):
+
+        if self.frequency == "monthly":
+            return (
+                f"{self.user} - "
+                f"{self.resource} - "
+                f"Día {self.day_of_month}"
+            )
 
         return (
             f"{self.user} - "
@@ -198,6 +237,35 @@ class RecurringBooking(models.Model):
         verbose_name_plural = "Reservas recurrentes"
 
         constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        frequency="weekly",
+                        day_of_week__isnull=False,
+                        day_of_month__isnull=True
+                    )
+                    | models.Q(
+                        frequency="monthly",
+                        day_of_month__isnull=False,
+                        day_of_week__isnull=True
+                    )
+                ),
+                name="check_recurring_frequency_day"
+            ),
+            models.UniqueConstraint(
+                fields=[
+                    "resource",
+                    "user",
+                    "frequency",
+                    "day_of_week",
+                    "day_of_month",
+                    "start_time",
+                    "end_time",
+                    "start_date",
+                    "end_date"
+                ],
+                name="unique_recurring_booking"
+            ),
             models.UniqueConstraint(
                 fields=[
                     "resource",
@@ -208,7 +276,21 @@ class RecurringBooking(models.Model):
                     "start_date",
                     "end_date"
                 ],
-                name="unique_recurring_booking"
+                condition=models.Q(frequency="weekly"),
+                name="unique_weekly_recurring"
+            ),
+            models.UniqueConstraint(
+                fields=[
+                    "resource",
+                    "user",
+                    "day_of_month",
+                    "start_time",
+                    "end_time",
+                    "start_date",
+                    "end_date"
+                ],
+                condition=models.Q(frequency="monthly"),
+                name="unique_monthly_recurring"
             )
         ]
 

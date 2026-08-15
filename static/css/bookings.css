@@ -1,0 +1,415 @@
+/* ==========================================================================
+   Padel Arena — Estilos de reservas
+   Grid de pistas, formulario de reserva, lista de reservas y badges
+   Reutiliza los tokens de diseño definidos en base.css
+   ========================================================================== */
+
+:root {
+  --color-amber-500: #F59E0B;
+  --color-red-500: #EF4444;
+  --color-red-600: #DC2626;
+}
+
+/* --------------------------------------------------------------------------
+   Cabecera de página (pistas, reserva, mis reservas)
+   -------------------------------------------------------------------------- */
+.bookings-section,
+.booking-section {
+  padding: 56px 0 80px;
+}
+
+.page-head {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-emerald-600);
+}
+
+.page-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-accent);
+}
+
+.page-title {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  line-height: 1.15;
+  color: var(--color-ink-900);
+}
+
+.page-sub {
+  margin-top: 14px;
+  color: var(--color-slate-500);
+  font-size: 1.05rem;
+}
+
+/* --------------------------------------------------------------------------
+   Grid de pistas
+   -------------------------------------------------------------------------- */
+.courts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.court-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.court-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.court-card__media {
+  display: grid;
+  place-items: center;
+  height: 150px;
+  background: linear-gradient(135deg, var(--color-ink-800), var(--color-ink-900));
+  color: var(--color-emerald-400);
+}
+
+.court-card__media svg {
+  width: 60px;
+  height: 60px;
+  opacity: 0.9;
+}
+
+.court-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  padding: 24px;
+}
+
+.court-card__body h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.court-card__body p {
+  font-size: 0.95rem;
+  color: var(--color-slate-500);
+}
+
+.court-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* --------------------------------------------------------------------------
+   Formulario de reserva (tarjeta oscura, coherente con auth.css)
+   -------------------------------------------------------------------------- */
+.booking-card {
+  max-width: 600px;
+  padding: 40px;
+  background: var(--color-ink-800);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-slate-200);
+}
+
+.booking-card form {
+  display: grid;
+  gap: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label,
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-slate-300);
+}
+
+.field select,
+.field input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--color-ink-900);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input[type="date"] {
+  color-scheme: dark;
+}
+
+.field select:focus,
+.field input:focus {
+  outline: none;
+  border-color: var(--color-emerald-500);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.field .errorlist {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-sm);
+  color: #FCA5A5;
+  font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   Slots (radios como tarjetas seleccionables)
+   -------------------------------------------------------------------------- */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.slot-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.slot-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slot-option span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  background: var(--color-ink-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  color: var(--color-slate-200);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, background 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slot-option:hover span {
+  border-color: var(--color-emerald-400);
+}
+
+.slot-option input:checked + span {
+  border-color: var(--color-emerald-500);
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-white);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.slot-option input:focus-visible + span {
+  outline: 2px solid var(--color-emerald-500);
+  outline-offset: 2px;
+}
+
+.slots-hint,
+.slots-empty {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.slots-hint {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  color: var(--color-slate-400);
+}
+
+.slots-empty {
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #FCD34D;
+}
+
+.btn-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.form-back {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-slate-400);
+}
+
+.form-back a {
+  font-weight: 600;
+  color: var(--color-emerald-400);
+  transition: color 0.2s ease;
+}
+
+.form-back a:hover {
+  color: var(--color-teal-400);
+}
+
+/* --------------------------------------------------------------------------
+   Lista de reservas
+   -------------------------------------------------------------------------- */
+.list-heading {
+  margin: 32px 0 16px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.booking-list {
+  display: grid;
+  gap: 16px;
+}
+
+.booking-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 24px;
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.booking-item__info {
+  flex: 1;
+  min-width: 220px;
+}
+
+.booking-item__info h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.booking-item__info p {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  color: var(--color-slate-500);
+}
+
+.booking-item__cancel {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Badges de estado
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge--confirmed {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-emerald-700);
+}
+
+.badge--pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #B45309;
+}
+
+.badge--cancelled {
+  background: rgba(239, 68, 68, 0.10);
+  color: var(--color-red-600);
+}
+
+.btn--cancel {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: transparent;
+  color: var(--color-red-600);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn--cancel:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--color-red-600);
+}
+
+.empty-state {
+  padding: 24px;
+  background: var(--color-slate-100);
+  border: 1px dashed var(--color-slate-300);
+  border-radius: var(--radius-md);
+  color: var(--color-slate-500);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.bookings-cta {
+  margin-top: 40px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .bookings-section,
+  .booking-section {
+    padding: 40px 0 64px;
+  }
+
+  .booking-card {
+    padding: 28px 20px;
+  }
+
+  .booking-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

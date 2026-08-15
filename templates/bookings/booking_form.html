@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reservar pista - Padel Arena{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/bookings.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="booking-section container">
+  <div class="page-head">
+    <span class="page-eyebrow">Nueva reserva</span>
+    <h1 class="page-title">Reserva tu pista</h1>
+    <p class="page-sub">Elige una pista y una fecha para ver los horarios disponibles.</p>
+  </div>
+
+  <div class="booking-card">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="{{ form.resource.id_for_label }}">Pista</label>
+        {{ form.resource }}
+        {{ form.resource.errors }}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.date.id_for_label }}">Fecha</label>
+        {{ form.date }}
+        {{ form.date.errors }}
+      </div>
+
+      <div class="field">
+        <span class="field-label">Horario</span>
+        {% if slots %}
+          <div class="slot-grid">
+            {% for slot in slots %}
+              <label class="slot-option">
+                <input type="radio" name="slot" value="{{ slot.start|date:'H:i' }}"
+                       {% if form.slot.value == slot.start|date:'H:i' %}checked{% endif %}>
+                <span>{{ slot.start|date:'H:i' }} - {{ slot.end|date:'H:i' }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        {% elif slots is not None %}
+          <p class="slots-empty">No hay horarios disponibles para esa fecha.</p>
+        {% else %}
+          <p class="slots-hint">Selecciona una pista y una fecha para ver los horarios disponibles.</p>
+        {% endif %}
+        {{ form.slot.errors }}
+      </div>
+
+      <button type="submit" class="btn btn--primary btn-submit">Confirmar reserva</button>
+    </form>
+
+    <p class="form-back"><a href="{% url 'pistas' %}">Volver a pistas</a></p>
+  </div>
+</section>
+{% endblock %}

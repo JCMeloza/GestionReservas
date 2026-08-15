@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis reservas - Padel Arena{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/bookings.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="bookings-section container">
+  <div class="page-head">
+    <span class="page-eyebrow">Tu actividad</span>
+    <h1 class="page-title">Mis reservas</h1>
+  </div>
+
+  <h2 class="list-heading">Próximas</h2>
+  {% if upcoming %}
+    <ul class="booking-list">
+      {% for b in upcoming %}
+        <li class="booking-item">
+          <div class="booking-item__info">
+            <h3>{{ b.resource.name }}</h3>
+            <p>{{ b.start_date|date:'l d/m/Y' }} · {{ b.start_date|date:'H:i' }} - {{ b.end_date|date:'H:i' }} h</p>
+          </div>
+          <span class="badge badge--{{ b.status }}">{{ b.get_status_display }}</span>
+          <form action="{% url 'cancelar-reserva' b.pk %}" method="post" class="booking-item__cancel">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--cancel">Cancelar</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty-state">No tienes próximas reservas.</p>
+  {% endif %}
+
+  <h2 class="list-heading">Pasadas</h2>
+  {% if past %}
+    <ul class="booking-list">
+      {% for b in past %}
+        <li class="booking-item">
+          <div class="booking-item__info">
+            <h3>{{ b.resource.name }}</h3>
+            <p>{{ b.start_date|date:'l d/m/Y' }} · {{ b.start_date|date:'H:i' }} - {{ b.end_date|date:'H:i' }} h</p>
+          </div>
+          <span class="badge badge--{{ b.status }}">{{ b.get_status_display }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty-state">No tienes reservas pasadas.</p>
+  {% endif %}
+
+  <p class="bookings-cta">
+    <a class="btn btn--primary" href="{% url 'reservar' %}">Reservar pista</a>
+  </p>
+</section>
+{% endblock %}

@@ -214,6 +214,11 @@ class RecurringBooking(models.Model):
                     "La fecha inicial no coincide con el día seleccionado."
                 )
 
+        else:
+            raise ValidationError(
+                "Frecuencia de repetición no válida."
+            )
+
 
     def __str__(self):
 
@@ -247,7 +252,8 @@ class RecurringBooking(models.Model):
                     | models.Q(
                         frequency="monthly",
                         day_of_month__isnull=False,
-                        day_of_week__isnull=True
+                        day_of_week__isnull=True,
+                        day_of_month__range=(1, 31)
                     )
                 ),
                 name="check_recurring_frequency_day"

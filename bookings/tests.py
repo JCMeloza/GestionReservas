@@ -42,7 +42,7 @@ class RecurringBookingModelTests(TestCase):
 
     def test_clean_weekly_valid(self):
         booking = self.make_booking()
-        self.assertIsNone(booking.full_clean())
+        booking.full_clean()
 
     def test_clean_monthly_valid(self):
         booking = self.make_booking(
@@ -50,7 +50,7 @@ class RecurringBookingModelTests(TestCase):
             day_of_week=None,
             day_of_month=self.start_date.day,
         )
-        self.assertIsNone(booking.full_clean())
+        booking.full_clean()
 
     def test_clean_weekly_with_day_of_month_rejected(self):
         booking = self.make_booking(day_of_month=15)
@@ -137,6 +137,30 @@ class RecurringBookingModelTests(TestCase):
                 end_date=self.start_date + timedelta(days=30),
             )
 
+    def test_check_constraint_rejects_monthly_day_of_month_out_of_range(self):
+        # The DB constraint must close the bypass around the field validators
+        # (objects.create skips clean()).
+        with self.assertRaises(IntegrityError):
+            RecurringBooking.objects.create(
+                resource=self.resource,
+                user=self.user,
+                frequency="monthly",
+                day_of_week=None,
+                day_of_month=32,
+                start_time=time(10, 0),
+                end_time=time(11, 0),
+                start_date=self.start_date,
+                end_date=self.start_date + timedelta(days=90),
+            )
+
+    def test_clean_unknown_frequency_rejected(self):
+        # full_clean() already rejects unknown choices via field validation;
+        # this exercises the clean() guard directly (defense in depth).
+        booking = self.make_booking(frequency="unknown")
+        with self.assertRaises(ValidationError) as ctx:
+            booking.clean()
+        self.assertIn("Frecuencia de repetición no válida.", str(ctx.exception))
+
     def test_unique_weekly_recurring_rejects_duplicate(self):
         RecurringBooking.objects.create(
             resource=self.resource,
@@ -204,7 +228,7 @@ class RecurringBookingModelTests(TestCase):
             day_of_week=None,
             day_of_month=self.start_date.day,
         )
-        self.assertIsNone(monthly.full_clean())
+        monthly.full_clean()
         monthly.save()
         self.assertEqual(RecurringBooking.objects.count(), 2)
 
@@ -229,7 +253,7 @@ class RecurringBookingModelTests(TestCase):
                     day_of_month=value,
                     start_date=start_date,
                 )
-                self.assertIsNone(booking.full_clean())
+                booking.full_clean()
 
 
 class RecurringBookingMigrationTests(TransactionTestCase):

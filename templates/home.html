@@ -117,65 +117,15 @@
       </div>
 
       <div class="courts-grid">
+        {% for resource in resources %}
         <article class="court-card">
           <div class="court-card__media">
+            {% if resource.court_type == 'indoor' %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg>
-          </div>
-          <div class="court-card__body">
-            <h3>Pista Central</h3>
-            <div class="court-card__tags">
-              <span class="tag">Cubierta</span>
-              <span class="tag">Indoor</span>
-              <span class="tag">Césped profesional</span>
-            </div>
-            <p>La pista principal del club, con tribuna y zona de espectadores para torneos y exhibiciones.</p>
-            <p class="court-card__price">desde <span>18 €/h</span></p>
-          </div>
-        </article>
-
-        <article class="court-card">
-          <div class="court-card__media">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </div>
-          <div class="court-card__body">
-            <h3>Pista Cubierta 2</h3>
-            <div class="court-card__tags">
-              <span class="tag">Cubierta</span>
-              <span class="tag">Indoor</span>
-              <span class="tag">Iluminación LED</span>
-            </div>
-            <p>Climatizada y con iluminación de última generación, ideal para jugar a cualquier hora.</p>
-            <p class="court-card__price">desde <span>14 €/h</span></p>
-          </div>
-        </article>
-
-        <article class="court-card">
-          <div class="court-card__media">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </div>
-          <div class="court-card__body">
-            <h3>Pista Cubierta 3</h3>
-            <div class="court-card__tags">
-              <span class="tag">Cubierta</span>
-              <span class="tag">Indoor</span>
-              <span class="tag">Competición</span>
-            </div>
-            <p>La favorita de nuestros socios para partidos de competición y entrenamientos técnicos.</p>
-            <p class="court-card__price">desde <span>14 €/h</span></p>
-          </div>
-        </article>
-
-        <article class="court-card">
-          <div class="court-card__media">
+            {% else %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -187,18 +137,26 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
+            {% endif %}
           </div>
           <div class="court-card__body">
-            <h3>Pistas Exterior 1-6</h3>
+            <h3>{{ resource.name }}</h3>
             <div class="court-card__tags">
+              {% if resource.court_type == 'indoor' %}
+              <span class="tag">Cubierta</span>
+              <span class="tag">Indoor</span>
+              {% else %}
               <span class="tag">Descubiertas</span>
               <span class="tag">Outdoor</span>
-              <span class="tag">Vidrio templado</span>
+              {% endif %}
             </div>
-            <p>Seis pistas al aire libre con césped de alto rendimiento y entorno natural.</p>
-            <p class="court-card__price">desde <span>10 €/h</span></p>
+            <p>{{ resource.description }}</p>
+            <p class="court-card__price">desde <span>{{ resource.price_per_hour|floatformat:"-2" }} €/h</span></p>
           </div>
         </article>
+        {% empty %}
+        <p>No hay pistas disponibles por ahora.</p>
+        {% endfor %}
       </div>
     </div>
   </section>

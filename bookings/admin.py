@@ -6,6 +6,8 @@ from .models import Resource, Availability, Booking, RecurringBooking
 class ResourceAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "price_per_hour",
+        "court_type",
         "is_active",
     )
 

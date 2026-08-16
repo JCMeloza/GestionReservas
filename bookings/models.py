@@ -18,6 +18,18 @@ class Resource(models.Model):
         null=True
     )
 
+    price_per_hour = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=0
+    )
+
+    court_type = models.CharField(
+        max_length=20,
+        choices=[('indoor', 'Cubierta'), ('outdoor', 'Exterior')],
+        default='outdoor'
+    )
+
     is_active = models.BooleanField(
         default=True
     )

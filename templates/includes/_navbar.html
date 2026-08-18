@@ -28,7 +28,7 @@
 
         <div class="nav-auth">
           {% if user.is_authenticated %}
-            <a class="nav-auth__link" href="#">Mis reservas</a>
+            <a class="nav-auth__link" href="{% url 'reservar' %}">Mis reservas</a>
             <span class="nav-auth__user">{{ user.get_full_name|default:user.username }}</span>
             <form action="{% url 'logout' %}" method="post" class="nav-auth__logout">
               {% csrf_token %}

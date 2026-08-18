@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from bookings.views import HomeView
+from bookings.views import HomeView, BookingView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomeView.as_view(), name='home'),
+    path('reservar/', BookingView.as_view(), name='reservar'),
     path('', include('users.urls')),
 ]

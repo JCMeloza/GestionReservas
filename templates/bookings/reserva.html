@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reservar Pista — Padel Arena{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container">
+  <div class="booking-layout">
+
+    <!-- ===================== COLUMNA IZQUIERDA — Pasos + Filtro ===================== -->
+    <aside class="booking-sidebar">
+
+      <!-- Steps indicator -->
+      <nav class="steps" aria-label="Progreso de reserva">
+        <div class="step step--active" data-step="1">
+          <span class="step__number">1</span>
+          <span>Fecha</span>
+        </div>
+        <div class="step" data-step="2">
+          <span class="step__number">2</span>
+          <span>Pista</span>
+        </div>
+        <div class="step" data-step="3">
+          <span class="step__number">3</span>
+          <span>Hora</span>
+        </div>
+        <div class="step" data-step="4">
+          <span class="step__number">4</span>
+          <span>Confirmar</span>
+        </div>
+      </nav>
+
+      <div class="steps-divider"></div>
+
+      <!-- Filtro tipo pista -->
+      <p class="filter-label">Tipo de pista</p>
+      <div class="filter-options" role="radiogroup" aria-label="Filtrar por tipo de pista">
+        <label class="filter-option">
+          <input type="radio" name="court-filter" value="all" checked>
+          Todas
+        </label>
+        <label class="filter-option">
+          <input type="radio" name="court-filter" value="indoor">
+          Cubierta
+        </label>
+        <label class="filter-option">
+          <input type="radio" name="court-filter" value="outdoor">
+          Exterior
+        </label>
+      </div>
+
+      <!-- Ilustración -->
+      <div class="booking-illustration">
+        <!-- SVG inline: silueta estilizada de jugador de pádel -->
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Cabeza -->
+          <circle cx="68" cy="22" r="10" fill="currentColor" opacity="0.9"/>
+          <!-- Cuerpo -->
+          <path d="M68 32 L62 60 L54 82" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <!-- Brazo con raqueta -->
+          <path d="M62 42 L82 34 L96 26" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Raqueta -->
+          <ellipse cx="100" cy="22" rx="8" ry="12" stroke="currentColor" stroke-width="2.5" fill="none" transform="rotate(-15 100 22)"/>
+          <line x1="96" y1="26" x2="100" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Piernas -->
+          <path d="M62 60 L48 88" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M54 82 L60 96" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Pelota -->
+          <circle cx="88" cy="42" r="4" fill="currentColor" opacity="0.7"/>
+          <!-- Línea de movimiento de pelota -->
+          <path d="M84 38 Q86 40 88 42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.4"/>
+        </svg>
+      </div>
+    </aside>
+
+    <!-- ===================== COLUMNA CENTRAL — Calendario ===================== -->
+    <div class="booking-calendar">
+      <h1 class="calendar-title">Reserva de Pista de Pádel</h1>
+
+      <div class="calendar-header">
+        <h2 class="calendar-month" id="calendar-month-label"></h2>
+        <div class="calendar-nav">
+          <button class="calendar-nav__btn" id="prev-month" type="button" aria-label="Mes anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="calendar-nav__btn" id="next-month" type="button" aria-label="Mes siguiente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="calendar-grid" id="calendar-grid" role="grid" aria-label="Calendario de reservas">
+        <!-- Se llena con JS -->
+      </div>
+
+      <!-- Selector de pistas (debajo del calendario) -->
+      <div class="courts-section">
+        <label class="courts-select-label" for="court-select">Elegí una pista</label>
+        <select class="courts-select" id="court-select">
+          <option value="">— Seleccioná una pista —</option>
+          <!-- Se llena con JS -->
+        </select>
+
+        <!-- Card info de la pista seleccionada -->
+        <div class="court-info-card" id="court-info-card" style="display:none;">
+          <div class="court-info-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="1.5"/>
+              <line x1="12" y1="4" x2="12" y2="20"/>
+              <line x1="2" y1="10" x2="22" y2="10"/>
+            </svg>
+          </div>
+          <div class="court-info-card__body">
+            <div class="court-info-card__row">
+              <span class="court-info-card__name" id="court-info-name"></span>
+              <span class="court-badge" id="court-info-badge"></span>
+            </div>
+            <p class="court-info-card__desc" id="court-info-desc"></p>
+            <div class="court-info-card__price" id="court-info-price"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== COLUMNA DERECHA — Resumen ===================== -->
+    <div class="booking-right">
+
+      <!-- Tarjeta resumen -->
+      <div class="summary-card">
+        <div class="summary-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="summary-card__details">
+          <div class="summary-detail" id="summary-court">
+            <div class="summary-detail__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
+            </div>
+            <span class="summary-detail__text summary-detail--placeholder" id="summary-court-text">Elegí una pista</span>
+          </div>
+          <div class="summary-detail" id="summary-datetime">
+            <div class="summary-detail__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            </div>
+            <span class="summary-detail__text summary-detail--placeholder" id="summary-datetime-text">Elegí fecha y hora</span>
+          </div>
+        </div>
+        <div class="summary-card__total" id="summary-total" style="display:none;">
+          <span>Total</span>
+          <strong id="summary-total-amount">0,00 &euro;</strong>
+        </div>
+        <!-- Botón Confirmar (solo visible en paso 4) -->
+        <button class="summary-confirm-btn" id="summary-confirm-btn" type="button" style="display:none;">
+          Confirmar Reserva
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== COMPONENTE FLOTANTE — Selector de horas ===================== -->
+<div class="time-picker-overlay" id="time-picker-overlay"></div>
+<div class="time-picker" id="time-picker" role="dialog" aria-label="Selección de hora">
+  <div class="time-picker__header">
+    <h3 class="time-picker__title">Elegí una hora</h3>
+    <button class="time-picker__close" id="time-picker-close" type="button" aria-label="Cerrar selector de horas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="time-grid" id="time-grid">
+    <!-- Se llena con JS -->
+  </div>
+  <button class="time-picker__submit" id="time-picker-submit" type="button" disabled>Continuar</button>
+</div>
+
+<!-- Datos de pistas desde Django (JSON) -->
+<script id="courts-data" type="application/json">
+  {{ courts_json|safe }}
+</script>
+
+<script src="{% static 'js/booking.js' %}" defer></script>
+{% endblock %}

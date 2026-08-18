@@ -1,0 +1,873 @@
+/* ==========================================================================
+   Padel Arena — Estilos de reserva de pista
+   Layout: 3 columnas (pasos + calendario + resumen/pistas)
+   Componentes: steps, calendario, tarjeta resumen, selector pistas, horas
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tokens locales (extienden base.css)
+   -------------------------------------------------------------------------- */
+:root {
+  --color-error: rgba(239, 68, 68, 0.55);
+  --color-error-bg: rgba(239, 68, 68, 0.08);
+  --color-emerald-soft: rgba(16, 185, 129, 0.10);
+  --color-emerald-border: rgba(16, 185, 129, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Layout principal — 3 columnas
+   -------------------------------------------------------------------------- */
+.booking-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 320px;
+  gap: 32px;
+  align-items: start;
+  padding: 48px 0 96px;
+}
+
+/* --------------------------------------------------------------------------
+   Columna izquierda — Pasos + Filtro
+   -------------------------------------------------------------------------- */
+.booking-sidebar {
+  position: sticky;
+  top: calc(var(--header-h) + 24px);
+}
+
+/* --- Steps indicator --- */
+.steps {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 32px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-slate-500);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.step__number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-slate-200);
+  color: var(--color-slate-500);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.step--active {
+  background: var(--color-emerald-soft);
+  color: var(--color-emerald-700);
+}
+
+.step--active .step__number {
+  background: var(--color-emerald-500);
+  color: var(--color-white);
+}
+
+.step--done .step__number {
+  background: var(--color-emerald-500);
+  color: var(--color-white);
+}
+
+.step--done {
+  color: var(--color-emerald-700);
+}
+
+.steps-divider {
+  height: 1px;
+  background: var(--color-slate-200);
+  margin: 16px 0;
+}
+
+/* --- Filtro tipo pista --- */
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-slate-400);
+  margin-bottom: 12px;
+}
+
+.filter-options {
+  display: grid;
+  gap: 6px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-slate-600);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.filter-option:hover {
+  background: var(--color-emerald-soft);
+  color: var(--color-emerald-700);
+}
+
+.filter-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-slate-300);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.filter-option input[type="radio"]:checked {
+  border-color: var(--color-emerald-500);
+  background: var(--color-emerald-500);
+  box-shadow: inset 0 0 0 3px var(--color-white);
+}
+
+.filter-option input[type="radio"]:focus-visible {
+  outline: 2px solid var(--color-emerald-500);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Columna central — Calendario
+   -------------------------------------------------------------------------- */
+.booking-calendar {
+  min-width: 0;
+}
+
+.calendar-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: var(--color-ink-900);
+  margin-bottom: 24px;
+}
+
+/* --- Header del mes --- */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calendar-month {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-ink-900);
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.calendar-nav__btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-slate-200);
+  background: var(--color-white);
+  color: var(--color-slate-600);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.calendar-nav__btn:hover {
+  border-color: var(--color-emerald-500);
+  color: var(--color-emerald-500);
+}
+
+.calendar-nav__btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Grid del calendario --- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-slate-400);
+  padding: 8px 0;
+}
+
+.calendar-day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  border: 2px solid transparent;
+}
+
+/* Estado: disponible */
+.calendar-day--available {
+  color: var(--color-ink-900);
+  background: var(--color-white);
+  border-color: var(--color-slate-200);
+}
+
+.calendar-day--available:hover {
+  border-color: var(--color-emerald-400);
+  background: var(--color-emerald-soft);
+  transform: scale(1.08);
+}
+
+/* Estado: seleccionado */
+.calendar-day--selected {
+  background: var(--color-emerald-500);
+  color: var(--color-white);
+  border-color: var(--color-emerald-500);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Estado: no disponible */
+.calendar-day--unavailable {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-color: transparent;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: var(--color-error);
+}
+
+/* Estado: vacío (celda del mes anterior/siguiente) */
+.calendar-day--empty {
+  cursor: default;
+}
+
+.calendar-day:focus-visible {
+  outline: 2px solid var(--color-emerald-500);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Columna derecha — Resumen + Selector de pistas
+   -------------------------------------------------------------------------- */
+.booking-right {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+
+/* --- Tarjeta resumen --- */
+.summary-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.summary-card__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--color-emerald-500);
+  color: var(--color-white);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+}
+
+.summary-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.summary-card__details {
+  display: grid;
+  gap: 14px;
+  text-align: left;
+}
+
+.summary-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+}
+
+.summary-detail__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-emerald-soft);
+  color: var(--color-emerald-600);
+  flex-shrink: 0;
+}
+
+.summary-detail__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.summary-detail__text {
+  color: var(--color-slate-600);
+}
+
+.summary-detail__text strong {
+  color: var(--color-ink-900);
+  font-weight: 700;
+}
+
+.summary-card__total {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1rem;
+}
+
+.summary-card__total span {
+  color: var(--color-slate-500);
+  font-weight: 600;
+}
+
+.summary-card__total strong {
+  color: var(--color-emerald-600);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* Placeholder cuando no hay selección */
+.summary-detail--placeholder {
+  color: var(--color-slate-400);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* --- Botón Confirmar Reserva --- */
+.summary-confirm-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--gradient-accent);
+  color: var(--color-white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: confirm-pop 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.summary-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.38);
+}
+
+.summary-confirm-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes confirm-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* --- Selector de pistas (debajo del calendario) --- */
+.courts-section {
+  margin-top: 32px;
+}
+
+.courts-select-label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-ink-900);
+  margin-bottom: 12px;
+}
+
+.courts-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--color-slate-200);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-ink-900);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+.courts-select:hover {
+  border-color: var(--color-emerald-border);
+}
+
+.courts-select:focus {
+  outline: none;
+  border-color: var(--color-emerald-500);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Card info de la pista seleccionada */
+.court-info-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 18px;
+  background: var(--color-white);
+  border: 2px solid var(--color-emerald-500);
+  border-radius: var(--radius-md);
+  animation: card-slide 0.25s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes card-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.court-info-card__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-emerald-soft);
+  color: var(--color-emerald-600);
+  flex-shrink: 0;
+}
+
+.court-info-card__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.court-info-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.court-info-card__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.court-info-card__name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-ink-900);
+}
+
+.court-badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.court-badge--indoor {
+  background: rgba(99, 102, 241, 0.10);
+  color: #6366f1;
+}
+
+.court-badge--outdoor {
+  background: rgba(245, 158, 11, 0.10);
+  color: #d97706;
+}
+
+.court-info-card__desc {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--color-slate-500);
+}
+
+.court-info-card__price {
+  margin-top: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-emerald-600);
+}
+
+/* --------------------------------------------------------------------------
+   Componente flotante — Selector de horas
+   -------------------------------------------------------------------------- */
+.time-picker {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 380px;
+  max-width: 90vw;
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(11, 18, 32, 0.25);
+  padding: 28px 24px;
+  display: none;
+}
+
+.time-picker--visible {
+  display: block;
+  animation: picker-slide 0.25s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes picker-slide {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Overlay */
+.time-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(11, 18, 32, 0.45);
+  backdrop-filter: blur(4px);
+  display: none;
+}
+
+.time-picker-overlay--visible {
+  display: block;
+  animation: overlay-fade 0.2s ease both;
+}
+
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.time-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.time-picker__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-ink-900);
+}
+
+.time-picker__close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-slate-200);
+  background: none;
+  color: var(--color-slate-500);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.time-picker__close:hover {
+  border-color: var(--color-slate-400);
+  color: var(--color-ink-900);
+}
+
+.time-picker__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Grid de horas */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.time-slot {
+  display: grid;
+  place-items: center;
+  padding: 12px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  border: 2px solid var(--color-slate-200);
+  background: var(--color-white);
+  color: var(--color-ink-900);
+  position: relative;
+}
+
+.time-slot:hover:not(.time-slot--unavailable):not(.time-slot--selected) {
+  border-color: var(--color-emerald-400);
+  transform: scale(1.04);
+}
+
+/* Seleccionada */
+.time-slot--selected {
+  background: var(--color-emerald-500);
+  border-color: var(--color-emerald-500);
+  color: var(--color-white);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* No disponible — diagonal tachando */
+.time-slot--unavailable {
+  background: var(--color-slate-100);
+  border-color: var(--color-slate-200);
+  color: var(--color-slate-400);
+  cursor: not-allowed;
+}
+
+.time-slot--unavailable::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 1px),
+    var(--color-slate-300) calc(50% - 1px),
+    var(--color-slate-300) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  pointer-events: none;
+}
+
+.time-slot:focus-visible {
+  outline: 2px solid var(--color-emerald-500);
+  outline-offset: 2px;
+}
+
+/* Botón continuar */
+.time-picker__submit {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--gradient-accent);
+  color: var(--color-white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.time-picker__submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.38);
+}
+
+.time-picker__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   SVG Ilustración jugador
+   -------------------------------------------------------------------------- */
+.booking-illustration {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--color-ink-900);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.booking-illustration svg {
+  width: 140px;
+  height: 140px;
+  color: var(--color-emerald-400);
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .booking-layout {
+    grid-template-columns: 200px 1fr 280px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 960px) {
+  .booking-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* Ocultar pasos en tablet, filtro arriba del calendario */
+  .booking-sidebar {
+    position: static;
+    grid-column: 1 / -1;
+  }
+
+  .steps {
+    display: none;
+  }
+
+  .steps-divider {
+    display: none;
+  }
+
+  /* Filtro horizontal */
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-option {
+    padding: 8px 16px;
+    border: 1px solid var(--color-slate-200);
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: 0.85rem;
+  }
+
+  .filter-option:hover {
+    background: var(--color-emerald-soft);
+  }
+
+  /* Ilustración oculta */
+  .booking-illustration {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 24px 0 72px;
+  }
+
+  .calendar-grid {
+    gap: 4px;
+  }
+
+  .calendar-day {
+    font-size: 0.85rem;
+  }
+
+  .summary-card {
+    padding: 20px 18px;
+  }
+
+  .time-picker {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+  }
+
+  .time-picker--visible {
+    animation: picker-slide-up 0.25s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  @keyframes picker-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .time-picker--visible,
+  .time-picker-overlay--visible {
+    animation: none;
+  }
+
+  .calendar-day:hover,
+  .time-slot:hover {
+    transform: none;
+  }
+}
